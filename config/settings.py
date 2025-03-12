@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 LOGGING_CONFIG = {
-    'level': logging.WARN,  # Changed to DEBUG for detailed logging
+    'level': logging.ERROR,  # Changed to DEBUG for detailed logging
     'format': '%(asctime)s - %(levelname)s - %(message)s',
     'handlers': [
         logging.FileHandler('scraper.log'),
