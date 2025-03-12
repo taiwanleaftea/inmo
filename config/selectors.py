@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 WEBSITE_CONFIG = {
     'huurwoningen': {
         'base_url': 'https://www.huurwoningen.nl/in/delft/',
-        'listings_selector': 'section.listing-search-item',
+        'listings_selector': 'section.listing-search-item:has(div.listing-search-item__price)',
         'selectors': {
             'title': ('.listing-search-item__title', 'text', None),
             'price': ('.listing-search-item__price', 'text',
@@ -20,7 +20,7 @@ WEBSITE_CONFIG = {
     },
     'pararius': {
         'base_url': 'https://www.pararius.com/apartments/delft',
-        'listings_selector': 'li.search-list__item--listing',
+        'listings_selector': 'li.search-list__item--listing:has(.listing-search-item__price)',
         'selectors': {
             'title': ('.listing-search-item__title', 'text', None),
             'price': ('.listing-search-item__price', 'text',
@@ -40,7 +40,7 @@ WEBSITE_CONFIG = {
     },
     'rentaroom': {
         'base_url': 'https://rent-a-room-delft.nl/grid-default/',
-        'listings_selector': 'div.item-listing-wrap',
+        'listings_selector': 'div.item-listing-wrap:has(li.item-price)',
         'selectors': {
             'title': ('h2.item-title a', 'text', None),
             'price': ('li.item-price', 'text',

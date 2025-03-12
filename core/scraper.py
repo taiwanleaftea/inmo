@@ -17,7 +17,6 @@ class RealEstateScraper:
         self.session = requests.Session()
         self.logger = logging.getLogger(site)
         
-        # Configure retries
         retries = Retry(
             total=3,
             backoff_factor=0.5,
@@ -48,24 +47,29 @@ class RealEstateScraper:
 
             target = element.select_one(css_selector)
             if not target:
+                self.logger.debug(f"No element found for selector {css_selector} in {element.prettify()}")
                 return None
                 
             if target_type == 'text':
                 value = target.get_text(strip=True)
+                self.logger.debug(f"Extracted value '{value}' from {css_selector}")
             elif target_type == 'href':
                 value = urljoin(self.config['base_url'], target['href'])
             else:
                 value = target.get(target_type, None)
 
             if processor and value:
-                return processor(value)
+                result = processor(value)
+                self.logger.debug(f"Processed '{value}' to {result} for {css_selector}")
+                return result
             return value
                 
         except Exception as e:
-            self.logger.warning(f"Extraction error: {str(e)}")
+            self.logger.warning(f"Extraction error: {str(e)} for {element.prettify()}")
             return None
 
     def process_listing(self, element):
+        self.logger.debug(f"Processing listing: {element.prettify()}")
         try:
             if self.site == 'rentaroom':
                 is_rented = self.safe_extract(element, self.config['selectors']['rented'])
@@ -85,10 +89,11 @@ class RealEstateScraper:
                 raw_data['rooms'] = int(raw_data['rooms'])
                 raw_data['size'] = int(raw_data['size'])
             except ValueError:
-                self.logger.debug("Invalid numeric conversion")
+                self.logger.debug(f"Invalid numeric conversion: {raw_data}")
                 return None
 
             if not all([raw_data['title'], raw_data['price'] > 0, raw_data['url']]):
+                self.logger.debug(f"Skipping due to invalid data: {raw_data}")
                 return None
                 
             listing = {
@@ -101,8 +106,10 @@ class RealEstateScraper:
             }
             
             if listing['price'] > (listing['rooms'] * 600):
+                self.logger.debug(f"Price {listing['price']} exceeds threshold for {listing['rooms']} rooms")
                 return None
                 
+            self.logger.debug(f"Valid listing: {listing}")
             return listing
                 
         except Exception as e:
